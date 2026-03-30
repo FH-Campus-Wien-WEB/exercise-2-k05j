@@ -4,6 +4,18 @@ body {
   color: #e0e0e0;
 }
 
+h1 {
+  color: #d4af37;
+}
+
+h2 {
+  color: #d4af37;
+}
+
+.movie-title {
+  color: #d4af37;
+}
+
 .button {
   display: block;
   width: 250px;
@@ -28,4 +40,10 @@ body {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.button-group {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
 }

@@ -16,7 +16,7 @@ class MovieModel {
       metascore,
       imdbRating
    ) {
-      this.imdbID = Symbol.for(imdbID)
+      this.imdbID = imdbID
       this.title = title
       this.released = released
       this.runtime = parseInt(runtime)
@@ -39,7 +39,7 @@ async function parseMovies() {
       const { imdbID, title, released, runtime, genres, directors, writers, actors, plot, poster, metascore, imdbRating } = JSON.parse(movieData)
       movies.push(new MovieModel(imdbID, title, released, runtime, genres, directors, writers, actors, plot, poster, metascore, imdbRating))
    }
-   return movies
+   return movies.sort((a, b) => new Date(a.released).getTime() - new Date(b.released).getTime())   // I want oldest first
 }
 
 module.exports = { MovieModel, parseMovies }

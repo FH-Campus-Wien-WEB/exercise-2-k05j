@@ -11,11 +11,15 @@ app.use(bodyParser.json());
 // Serve static content in directory 'files'
 app.use(express.static(path.join(__dirname, 'files')));
 
+let movies = []  // parse the movies once at the start of the server, we can use this array to serve the movie data to the client
+
 // Configure a 'get' endpoint for all movies..
 app.get('/movies', async function (req, res) {
   try {
-    const parsedMovies = await parseMovies();
-    res.status(200).send(parsedMovies)
+    if (!movies || movies.length === 0) {
+      movies = await parseMovies()
+    }
+    res.status(200).send(movies)
   } catch (err) {
     console.error(err)
     res.status(500).send("Error retrieving movies")
@@ -23,10 +27,16 @@ app.get('/movies', async function (req, res) {
 })
 
 // Configure a 'get' endpoint for a specific movie
-app.get('/movies/:imdbID', function (req, res) {
-  /* Task 2.1. Remove the line below and add the 
-    functionality here */
-  res.sendStatus(404)
+app.get('/movies/:imdbID', async function (req, res) {
+  if (!movies || movies.length === 0) {
+    movies = await parseMovies()
+  }
+  const movie = movies.find(m => m.imdbID === req.params.imdbID)
+  if (movie) {
+    res.status(200).send(movie)
+  } else {
+    res.sendStatus(404)
+  }
 })
 
 /* Task 3.1 and 3.2.
