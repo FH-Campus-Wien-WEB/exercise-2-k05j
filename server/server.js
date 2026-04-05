@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const { parseMovies } = require('./movie-model.js');
+const fs = require('fs/promises')
 
 const app = express();
 
@@ -11,14 +12,10 @@ app.use(bodyParser.json());
 // Serve static content in directory 'files'
 app.use(express.static(path.join(__dirname, 'files')));
 
-let movies = []  // parse the movies once at the start of the server, we can use this array to serve the movie data to the client
-
 // Configure a 'get' endpoint for all movies..
 app.get('/movies', async function (req, res) {
   try {
-    if (!movies || movies.length === 0) {
-      movies = await parseMovies()
-    }
+    const movies = await parseMovies()
     res.status(200).send(movies)
   } catch (err) {
     console.error(err)
@@ -28,9 +25,7 @@ app.get('/movies', async function (req, res) {
 
 // Configure a 'get' endpoint for a specific movie
 app.get('/movies/:imdbID', async function (req, res) {
-  if (!movies || movies.length === 0) {
-    movies = await parseMovies()
-  }
+  const movies = await parseMovies()
   const movie = movies.find(m => m.imdbID === req.params.imdbID)
   if (movie) {
     res.status(200).send(movie)
@@ -43,6 +38,21 @@ app.get('/movies/:imdbID', async function (req, res) {
    - Add a new PUT endpoint
    - Check whether the movie sent by the client already exists 
      and continue as described in the assignment */
+app.put('/movies/:imdbID', async function (req, res) {
+  const imdbID = req.params.imdbID
+  const updatedMovie = req.body
+  const movies = await parseMovies()
+  const index = movies.findIndex(m => m.imdbID === imdbID)
+  if (index !== -1) {
+    movies[index] = updatedMovie
+    await fs.writeFile(path.join(__dirname, 'movie-data', encodeURI(updatedMovie.imdbID) + '.json'), JSON.stringify(updatedMovie, null, 2), 'utf-8')
+    res.sendStatus(204)
+  } else {
+    movies.push(updatedMovie)
+    await fs.writeFile(path.join(__dirname, 'movie-data', encodeURI(updatedMovie.imdbID) + '.json'), JSON.stringify(updatedMovie, null, 2), 'utf-8')
+    res.sendStatus(201)
+  }
+})
 
 app.listen(3000)
 
