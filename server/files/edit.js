@@ -3,12 +3,15 @@ function setMovie(movie) {
     const name = element.id;
     const value = movie[name];
 
-    if (name === "Genres") {
+    if (name === "genres") {
       const options = element.options;
       for (let index = 0; index < options.length; index++) {
         const option = options[index];
         option.selected = value.indexOf(option.value) >= 0;
       }
+    } else if (name === "poster") {
+      element.value = value;
+      document.getElementById("posterImage").src = value;
     } else {
       element.value = value;
     }
@@ -27,7 +30,7 @@ function getMovie() {
 
     let value;
 
-    if (name === "Genres") {
+    if (name === "genres") {
       value = [];
       const options = element.options;
       for (let index = 0; index < options.length; index++) {
@@ -37,15 +40,15 @@ function getMovie() {
         }
       }
     } else if (
-      name === "Metascore" ||
-      name === "Runtime" ||
+      name === "metascore" ||
+      name === "runtime" ||
       name === "imdbRating"
     ) {
       value = Number(element.value);
     } else if (
-      name === "Actors" ||
-      name === "Directors" ||
-      name === "Writers"
+      name === "actors" ||
+      name === "directors" ||
+      name === "writers"
     ) {
       value = element.value.split(",").map((item) => item.trim());
     } else {
@@ -66,6 +69,7 @@ function putMovie() {
     - Configure the function below as the onload event handler
     - Send the movie data as JSON
   */
+ console.log(getMovie());
 
   const xhr = new XMLHttpRequest();
   xhr.onload = function () {
